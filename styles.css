@@ -1,0 +1,17 @@
+body {
+	background-color: #222;
+	font-family: monospace;
+	color: #f66;
+}
+
+.container {
+	display: flex;
+	align-items: center;
+	margin-top: 2rem;
+	flex-wrap: wrap;
+}
+
+.container img {
+	width: 20em;
+	margin: 0.5em;
+}
