@@ -36,7 +36,7 @@ const addTVShowImage = async (query) => {
 		const img = document.createElement("img");
 		img.setAttribute("src", topURL);
 		container.appendChild(img);
-		console.log(`Added ${resultArray[0].show.name}`);
+		console.log(`Added "${resultArray[0].show.name}"`);
 	} else {
 		console.log(`No results found for "${query}"`);
 	}
