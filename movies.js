@@ -37,11 +37,9 @@ const addMovieImage = async (query) => {
 		return;
 	}
 	const imageURL = movie.URL;
-	console.log(imageURL);
 	const img = document.createElement("img");
 	img.setAttribute("src", imageURL);
 	container.appendChild(img);
-	console.log(`Added "${movie.title}"`);
 };
 
 const getMovieImageURL = async (query) => {
@@ -70,11 +68,12 @@ const getMovieImageURL = async (query) => {
 		bestMatch = exactMatches.reduce((bestMatch, current) => {
 			return current.vote_count * current.popularity > bestMatch.vote_count * bestMatch.popularity ? current : bestMatch;
 		});
+		console.group(`🎬 ${bestMatch.original_title}`);
+		console.log(`Score: ${Math.round(bestMatch.vote_count * bestMatch.popularity)}`);
 	} catch (e) {
+		console.groupEnd();
 		return false;
 	}
-	console.log(bestMatch);
-	console.log(`Retrieved "${bestMatch.original_title}"`);
 
 	const configRes = await axios.get(configEndpoint, { headers: config.headers });
 	// console.log(configRes.data);
@@ -84,6 +83,8 @@ const getMovieImageURL = async (query) => {
 	// poster_sizes (7) ['w92', 'w154', 'w185', 'w342', 'w500', 'w780', 'original']
 	const posterPath = bestMatch.poster_path;
 	const posterURL = `${baseURL}${fileSize}${posterPath}`;
+	console.log("Poster:", posterURL);
+	console.groupEnd();
 	return {
 		URL: posterURL,
 		title: bestMatch.original_title,
