@@ -1,25 +1,32 @@
-const form = document.querySelector("#searchForm");
-const container = document.querySelector(".container");
-
-let API_KEY = null;
-const getAPIKey = async () => {
-	const res = await fetch("/apiKeys.json");
-	const data = await res.json();
-	API_KEY = data.TMDB_API_KEY;
+const moviesApp = {
+	form: document.querySelector("#searchForm"),
+	container: document.querySelector(".container"),
+	movieSearchEndpoint: "https://api.themoviedb.org/3/search/movie",
+	configEndpoint: "https://api.themoviedb.org/3/configuration",
+	API_KEY: null,
+	addedMovies: [],
+	imgConfig: {},
+	headers: {},
+	async init() {
+		const res = await axios.get("/apiKeys.json");
+		this.API_KEY = res.data.TMDB_API_KEY;
+		this.headers = {
+			Authorization: this.API_KEY,
+			accept: "application/json",
+		};
+		const configRes = await axios.get(this.configEndpoint, { headers: this.headers });
+		this.imgConfig = configRes.data;
+	},
 };
-getAPIKey();
+moviesApp.init();
 
-form.addEventListener("submit", async function (event) {
+moviesApp.form.addEventListener("submit", async function (event) {
 	event.preventDefault();
 	const query = this.elements.query.value;
 	this.elements.query.value = "";
 	await addMovieImage(query);
 });
 
-const movieSearchEndpoint = "https://api.themoviedb.org/3/search/movie";
-const configEndpoint = "https://api.themoviedb.org/3/configuration";
-
-let addedList = [];
 const addMovieImage = async (query) => {
 	const movie = await getMovieImageURL(query);
 	if (!movie) {
@@ -28,12 +35,12 @@ const addMovieImage = async (query) => {
 	}
 	const img = document.createElement("img");
 	img.setAttribute("src", movie.posterURL);
-	container.appendChild(img);
+	moviesApp.container.appendChild(img);
 	logMovie(movie);
 };
 
 const logMovie = (movie) => {
-	addedList.push(movie);
+	moviesApp.addedMovies.push(movie);
 	console.group(`🎬 ${movie.title}`);
 	console.log(`Score: ${movie.score}`);
 	console.log("Poster:", movie.posterURL);
@@ -42,21 +49,14 @@ const logMovie = (movie) => {
 
 const getMovieImageURL = async (query) => {
 	const config = {
-		headers: {
-			Authorization: API_KEY,
-			accept: "application/json",
-		},
+		headers: moviesApp.headers,
 		params: {
 			query: query,
 		},
 	};
-	// const params = new URLSearchParams(config.params).toString();
-	// const res = await fetch(`https://api.themoviedb.org/3/search/movie?${params}`, { headers: config.headers });
-	// const data = await res.json();
-	// console.log(data);
 
 	let bestMatch;
-	const res = await axios.get(movieSearchEndpoint, config);
+	const res = await axios.get(moviesApp.movieSearchEndpoint, config);
 	try {
 		let exactMatches = res.data.results.filter((result) => result.original_title.toLowerCase() === query.toLowerCase());
 		if (exactMatches.length === 0) {
@@ -70,29 +70,9 @@ const getMovieImageURL = async (query) => {
 	} catch (e) {
 		return false;
 	}
-
-	const configRes = await axios.get(configEndpoint, { headers: config.headers });
-	// console.log(configRes.data);
-	const baseURL = configRes.data.images.base_url;
+	const baseURL = moviesApp.imgConfig.images.base_url;
 	const fileSize = "original";
-	// backdrop_sizes (4) ['w300', 'w780', 'w1280', 'original']
-	// poster_sizes (7) ['w92', 'w154', 'w185', 'w342', 'w500', 'w780', 'original']
 	const posterPath = bestMatch.poster_path;
 	bestMatch.posterURL = `${baseURL}${fileSize}${posterPath}`;
 	return bestMatch;
-	// const backdropPath = bestMatch.backdrop_path;
-	// const backdropURL = `${baseURL}/${fileSize}${backdropPath}`;
-	// console.log(backdropURL);
-
-	// Image API
-	// const movieId = bestMatch.id;
-	// const imgConfig = {
-	// 	headers: config.headers,
-	// 	params: {
-	// 		include_image_language: "en",
-	// 	},
-	// };
-	// const imgResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/images`, imgConfig);
-	// const data = imgResponse.data;
-	// console.log(data);
 };
