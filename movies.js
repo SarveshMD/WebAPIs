@@ -29,8 +29,12 @@ const addMovieImage = async (query) => {
 	const img = document.createElement("img");
 	img.setAttribute("src", movie.posterURL);
 	container.appendChild(img);
+	logMovie(movie);
+};
+
+const logMovie = (movie) => {
 	addedList.push(movie);
-	console.group(`🎬 ${movie.original_title}`);
+	console.group(`🎬 ${movie.title}`);
 	console.log(`Score: ${movie.score}`);
 	console.log("Poster:", movie.posterURL);
 	console.groupEnd();
