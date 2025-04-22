@@ -41,7 +41,7 @@ const addMovieImage = async (query) => {
 
 const logMovie = (movie) => {
 	moviesApp.addedMovies.push(movie);
-	console.group(`🎬 ${movie.title}`);
+	console.group(`🎬 ${movie.title} (${movie.release_date.slice(0, 4)})`);
 	console.log(`Score: ${movie.score}`);
 	console.log("Poster:", movie.posterURL);
 	console.groupEnd();
