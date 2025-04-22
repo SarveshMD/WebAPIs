@@ -1,14 +1,3 @@
-// const tvShows = ["The Watcher", "Stranger Things", "Dark", "Game of Thrones", "The Queen's Gambit", "House of the Dragon", "Normal People", "Adolescence", "The Penguin", "The Last of Us", "Loki", "WandaVision", "What If...?", "Moon Knight", "Hawkeye", "The Night Agent", "Fool Me Once", "The Summer I Turned Pretty", "A Good Girl's Guide To Murder", "The Haunting of Hill House", "3 Body Problem"];
-
-// axios
-// 	.get("https://api.tvmaze.com/search/shows?q=stranger+things")
-// 	.then((res) => {
-// 		console.log(res.data[0].show);
-// 	})
-// 	.catch((err) => {
-// 		console.log(err);
-// 	});
-
 const form = document.querySelector("#searchForm");
 const container = document.querySelector(".container");
 
@@ -30,16 +19,21 @@ form.addEventListener("submit", async function (event) {
 const movieSearchEndpoint = "https://api.themoviedb.org/3/search/movie";
 const configEndpoint = "https://api.themoviedb.org/3/configuration";
 
+let addedList = [];
 const addMovieImage = async (query) => {
 	const movie = await getMovieImageURL(query);
 	if (!movie) {
 		console.log("Movie Not Found!");
 		return;
 	}
-	const imageURL = movie.URL;
 	const img = document.createElement("img");
-	img.setAttribute("src", imageURL);
+	img.setAttribute("src", movie.posterURL);
 	container.appendChild(img);
+	addedList.push(movie);
+	console.group(`🎬 ${movie.original_title}`);
+	console.log(`Score: ${movie.score}`);
+	console.log("Poster:", movie.posterURL);
+	console.groupEnd();
 };
 
 const getMovieImageURL = async (query) => {
@@ -68,10 +62,8 @@ const getMovieImageURL = async (query) => {
 		bestMatch = exactMatches.reduce((bestMatch, current) => {
 			return current.vote_count * current.popularity > bestMatch.vote_count * bestMatch.popularity ? current : bestMatch;
 		});
-		console.group(`🎬 ${bestMatch.original_title}`);
-		console.log(`Score: ${Math.round(bestMatch.vote_count * bestMatch.popularity)}`);
+		bestMatch.score = Math.round(bestMatch.vote_count * bestMatch.popularity);
 	} catch (e) {
-		console.groupEnd();
 		return false;
 	}
 
@@ -82,13 +74,8 @@ const getMovieImageURL = async (query) => {
 	// backdrop_sizes (4) ['w300', 'w780', 'w1280', 'original']
 	// poster_sizes (7) ['w92', 'w154', 'w185', 'w342', 'w500', 'w780', 'original']
 	const posterPath = bestMatch.poster_path;
-	const posterURL = `${baseURL}${fileSize}${posterPath}`;
-	console.log("Poster:", posterURL);
-	console.groupEnd();
-	return {
-		URL: posterURL,
-		title: bestMatch.original_title,
-	};
+	bestMatch.posterURL = `${baseURL}${fileSize}${posterPath}`;
+	return bestMatch;
 	// const backdropPath = bestMatch.backdrop_path;
 	// const backdropURL = `${baseURL}/${fileSize}${backdropPath}`;
 	// console.log(backdropURL);
