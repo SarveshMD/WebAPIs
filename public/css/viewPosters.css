@@ -1,0 +1,13 @@
+.backdrops {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+.backdrops img {
+    width: 450px;
+}
+
+.posters img {
+    width: 200px;
+}

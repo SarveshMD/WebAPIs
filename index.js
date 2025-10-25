@@ -25,6 +25,14 @@ app.get("/tvshows", (req, res) => {
     res.sendFile(path.join(__dirname, "public/tvshows.html"))
 });
 
+app.get("/posters", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/posters.html"))
+})
+
+app.get("/viewPosters", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/viewPosters.html"))
+})
+
 app.get("/xml", (req, res) => {
     res.sendFile(path.join(__dirname, "public/XMLHttpRequest.html"))
 });
