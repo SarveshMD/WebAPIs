@@ -8,13 +8,12 @@
     <link rel="stylesheet" href="css/posters.css">
 </head>
 <body>
-    <h1>Search for Movies</h1>
+    <h1>Search for Movies / TV Shows</h1>
     <form id="searchForm">
         <input type="text" name="query" id="query" placeholder="Search" />
+        <label for="tvShow">TV Show</label>
+        <input type="checkbox" name="tvShow" id="tvShow">
         <button type="submit">Go!</button>
-        <select name="resultSelect" id="resultSelect">
-            <option value="" disabled selected>-- Select --</option>
-        </select>
     </form>
     <h1>Results</h1>
     <div id="results">

@@ -3,6 +3,8 @@ const moviesApp = {
 	configEndpoint: "https://api.themoviedb.org/3/configuration",
 	movieEndpoint: "https://api.themoviedb.org/3/movie",
 	imagesBaseURL: "https://image.tmdb.org/t/p/",
+	tvSearchEndpoint: "https://api.themoviedb.org/3/search/tv",
+	tvEndpoint: "https://api.themoviedb.org/3/tv/",
 	sizeConfigs: {
 		backdropSizes: ['w300', 'w780', 'w1280', 'original'],
 		logoSizes: ['w45', 'w92', 'w154', 'w185', 'w300', 'w500', 'original'],
@@ -24,13 +26,15 @@ const moviesApp = {
 
 const urlParams = new URLSearchParams(window.location.search);
 const movieID = urlParams.get('id');
+const tvShow = urlParams.get("tvShow");
+console.log(tvShow);
 const addMovieImages = async (movieID) => {
 	await moviesApp.init();
 	if (!movieID) {
 		console.log("Movie Not Found!");
 		return;
 	}
-	const res = await axios.get(`${moviesApp.movieEndpoint}/${movieID}/images`, {headers: moviesApp.headers, params: {include_image_language: "en,ta,null"}});
+	const res = await axios.get(`${tvShow?moviesApp.tvEndpoint:moviesApp.movieEndpoint}/${movieID}/images`, {headers: moviesApp.headers, params: {include_image_language: "en,ta,null"}});
 	const retrieved = res.data;
     document.querySelector("#movieTitle").innerText = urlParams.get('title');
 	const backdropSize = moviesApp.sizeConfigs.backdropSizes[1];

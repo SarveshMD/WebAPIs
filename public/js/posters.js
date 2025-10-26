@@ -3,6 +3,8 @@ const moviesApp = {
 	configEndpoint: "https://api.themoviedb.org/3/configuration",
 	movieEndpoint: "https://api.themoviedb.org/3/movie",
 	imagesBaseURL: "https://image.tmdb.org/t/p/",
+	tvSearchEndpoint: "https://api.themoviedb.org/3/search/tv",
+	tvEndpoint: "https://api.themoviedb.org/3/tv/",
 	sizeConfigs: {
 		backdropSizes: ['w300', 'w780', 'w1280', 'original'],
 		logoSizes: ['w45', 'w92', 'w154', 'w185', 'w300', 'w500', 'original'],
@@ -18,6 +20,7 @@ const moviesApp = {
 	},
 	queryParam: "",
 	page: 1,
+	tvShow: false,
 	async init() {
 		const res = await axios.get("/apiKeys.json");
 		this.headers.Authorization = res.data.TMDB_API_KEY;
@@ -34,6 +37,10 @@ document.querySelector("#searchForm").addEventListener("submit", async function 
 	const movie = await getMovieData(query);
 });
 
+document.querySelector("#tvShow").addEventListener("input", async function () {
+	console.log((moviesApp.tvShow?"uncheck":"check"));
+	moviesApp.tvShow = !(moviesApp.tvShow);
+})
 document.querySelector("#loadMore").addEventListener("click", async function() {
 	await getMovieData(moviesApp.queryParam, ++moviesApp.page);
 })
@@ -49,7 +56,6 @@ const logMovie = (movie) => {
 
 const getMovieData = async (query, page) => {
 	console.log("Called");
-	console.log(page);
 	const config = {
 		headers: moviesApp.headers,
 		params: {
@@ -59,7 +65,7 @@ const getMovieData = async (query, page) => {
 	};
 
 	let bestMatch;
-	const res = await axios.get(moviesApp.movieSearchEndpoint, config);
+	const res = await axios.get((moviesApp.tvShow?moviesApp.tvSearchEndpoint:moviesApp.movieSearchEndpoint), config);
 	console.log(res.data);
 	if (!page || page===1) {
 		container.innerHTML = '';
@@ -69,20 +75,24 @@ const getMovieData = async (query, page) => {
 			const card = document.createElement("div");
 			card.classList.add("card");
 			const h2 = document.createElement("h2");
-			h2.innerHTML = `${match.title} (${match.release_date.slice(0, 4)}, ${match.original_language})`;
 			const p = document.createElement("p");
 			p.innerText = match.overview;
 			const img = document.createElement("img");
 			const imgURL = `${moviesApp.imagesBaseURL}w342${match.poster_path}`;
 			img.setAttribute("src", imgURL);
 			img.setAttribute("id", match.id);
-			img.setAttribute("alt", match.title);
+			if (moviesApp.tvShow) {
+				h2.innerHTML = `${match.name} (${match.first_air_date.slice(0, 4)}, ${match.original_language})`;
+				img.setAttribute("alt", match.name);
+			} else {
+				h2.innerHTML = `${match.title} (${match.release_date.slice(0, 4)}, ${match.original_language})`;
+				img.setAttribute("alt", match.title);
+			}
 			img.addEventListener("click", imageClicked);
 			card.appendChild(img);
 			card.appendChild(h2);
 			card.appendChild(p);
 			container.appendChild(card);
-
 		}
 		let exactMatches = res.data.results.filter((result) => result.original_title.toLowerCase() === query.toLowerCase());
 		if (exactMatches.length === 0) {
@@ -106,8 +116,12 @@ function imageClicked() {
 		id: this.getAttribute("id"),
 		title: this.getAttribute("alt")
 	}
+	if (moviesApp.tvShow) {
+		params.tvShow = true;
+	}
 	const url = new URL("/viewPosters", window.location.origin);
 	url.search = new URLSearchParams(params).toString();
+	console.log(url.toString());
 	window.open(url.toString(), "_blank");
 };
 
