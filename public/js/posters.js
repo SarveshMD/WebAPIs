@@ -34,13 +34,13 @@ document.querySelector("#searchForm").addEventListener("submit", async function 
 	this.elements.query.value = "";
 	moviesApp.queryParam = query;
 	moviesApp.page = 1;
-	const movie = await getMovieData(query);
+	await getMovieData(query);
 });
 
 document.querySelector("#tvShow").addEventListener("input", async function () {
-	console.log((moviesApp.tvShow?"uncheck":"check"));
 	moviesApp.tvShow = !(moviesApp.tvShow);
 })
+
 document.querySelector("#loadMore").addEventListener("click", async function() {
 	await getMovieData(moviesApp.queryParam, ++moviesApp.page);
 })
@@ -55,7 +55,6 @@ const logMovie = (movie) => {
 };
 
 const getMovieData = async (query, page) => {
-	console.log("Called");
 	const config = {
 		headers: moviesApp.headers,
 		params: {
@@ -66,7 +65,6 @@ const getMovieData = async (query, page) => {
 
 	let bestMatch;
 	const res = await axios.get((moviesApp.tvShow?moviesApp.tvSearchEndpoint:moviesApp.movieSearchEndpoint), config);
-	console.log(res.data);
 	if (!page || page===1) {
 		container.innerHTML = '';
 	}
@@ -94,21 +92,10 @@ const getMovieData = async (query, page) => {
 			card.appendChild(p);
 			container.appendChild(card);
 		}
-		let exactMatches = res.data.results.filter((result) => result.original_title.toLowerCase() === query.toLowerCase());
-		if (exactMatches.length === 0) {
-			console.log("No Exact Results, falling back...");
-			exactMatches = res.data.results;
-		}
-		bestMatch = exactMatches.reduce((bestMatch, current) => {
-			return current.vote_count * current.popularity > bestMatch.vote_count * bestMatch.popularity ? current : bestMatch;
-		});
-		bestMatch.score = Math.round(bestMatch.vote_count * bestMatch.popularity);
-	} catch (e) {
-		return false;
 	}
-	console.log(bestMatch);
-	logMovie(bestMatch);
-	return bestMatch;
+	catch (e) {
+		console.log("Something went wrong with getMovieData...", e);
+	}
 };
 
 function imageClicked() {
@@ -121,11 +108,5 @@ function imageClicked() {
 	}
 	const url = new URL("/viewPosters", window.location.origin);
 	url.search = new URLSearchParams(params).toString();
-	console.log(url.toString());
 	window.open(url.toString(), "_blank");
 };
-
-const images = document.querySelectorAll("img")
-images.forEach(image => {
-	image.addEventListener("click", imageClicked);
-});
