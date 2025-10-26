@@ -9,13 +9,24 @@
 </head>
 <body>
     <h1 id="movieTitle"></h1>
-    <h1>Backdrops</h1>
-    <div class="container backdrops"></div>
-    <h1>Logos</h1>
-    <div class="container logos"></div>
-    <h1>Posters</h1>
-    <div class="container posters"></div>
+    <ul>
+        <li><a href="#backdrops">Backdrops</a></li>
+        <li><a href="#logos">Logos</a></li>
+        <li><a href="#posters">Posters</a></li>
+    </ul>
+    <div id="backdrops">
+        <h1>Backdrops</h1>
+        <div class="container backdrops"></div>
+    </div>
+    <div id="logos">
+        <h1>Logos</h1>
+        <div class="container logos"></div>
+    </div>
+    <div id="posters">
+        <h1>Posters</h1>
+        <div class="container posters"></div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
    <script src="js/viewPosters.js"></script>
-   </body>
+    </body>
 </html>

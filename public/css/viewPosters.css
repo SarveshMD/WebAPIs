@@ -11,3 +11,7 @@
 .posters img {
     width: 200px;
 }
+
+#movieTitle {
+    font-size: 2rem;
+}

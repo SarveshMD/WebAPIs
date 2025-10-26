@@ -27,7 +27,7 @@ const moviesApp = {
 const urlParams = new URLSearchParams(window.location.search);
 const movieID = urlParams.get('id');
 const tvShow = urlParams.get("tvShow");
-console.log(tvShow);
+
 const addMovieImages = async (movieID) => {
 	await moviesApp.init();
 	if (!movieID) {
